@@ -10,7 +10,12 @@ const refs = {
   gallery: document.querySelector('.gallery'),
   guard: document.querySelector('.js-guard'),
 };
-
+const optionsScroll = {
+  root: null,
+  rootMargin: '1000px',
+  threshold: 0,
+};
+const observer = new IntersectionObserver(onPagination, optionsScroll);
 refs.form.addEventListener('submit', onSearch);
 refs.gallery.addEventListener('click', onImgClick);
 
@@ -21,19 +26,13 @@ let showFindAndScroll = true;
 
 function onSearch(e) {
   e.preventDefault();
+  observer.unobserve(refs.guard);
   showFindAndScroll = true;
   counter = 1;
   refs.gallery.innerHTML = '';
   searchQuery = e.currentTarget.elements.searchQuery.value.trim();
   getImg(searchQuery);
 }
-
-const optionsScroll = {
-  root: null,
-  rootMargin: '1000px',
-  threshold: 0,
-};
-const observer = new IntersectionObserver(onPagination, optionsScroll);
 
 function onPagination(entries) {
   entries.forEach(entry => {
@@ -82,7 +81,6 @@ async function getImg(query) {
     console.log(error.message);
   }
 }
-let imgGallery = null;
 
 const optionSimple = {
   captions: true,
@@ -91,6 +89,10 @@ const optionSimple = {
   captionPosition: 'bottom',
   captionDelay: 250,
 };
+let imgGallery = new SimpleLightbox(
+  '.gallery .photo-card .img-link',
+  optionSimple
+);
 
 function galleryMarkup(imgData) {
   const markup = imgData.data.hits
@@ -119,11 +121,8 @@ function galleryMarkup(imgData) {
     )
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
+  imgGallery.refresh();
   observer.observe(refs.guard);
-  imgGallery = new SimpleLightbox(
-    '.gallery .photo-card .img-link',
-    optionSimple
-  );
 }
 
 function onImgClick(e) {

@@ -65,7 +65,6 @@ async function getImg(query) {
     console.log(error.message);
   }
 }
-let imgGallery = null;
 
 const option = {
   captions: true,
@@ -74,6 +73,7 @@ const option = {
   captionPosition: 'bottom',
   captionDelay: 250,
 };
+let imgGallery = new SimpleLightbox('.gallery .photo-card .img-link', option);
 
 function galleryMarkup(imgData) {
   const markup = imgData.data.hits
@@ -102,8 +102,8 @@ function galleryMarkup(imgData) {
     )
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
+  imgGallery.refresh();
   refs.loadMoreBtn.classList.remove('js-hide');
-  imgGallery = new SimpleLightbox('.gallery .photo-card .img-link', option);
 
   const { height: cardHeight } =
     refs.gallery.firstElementChild.getBoundingClientRect();
