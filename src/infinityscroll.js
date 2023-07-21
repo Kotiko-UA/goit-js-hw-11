@@ -17,11 +17,11 @@ refs.gallery.addEventListener('click', onImgClick);
 let counter = 1;
 let totalPageCounter = 40;
 let searchQuery = '';
-let showFindAndScroll = 1;
+let showFindAndScroll = true;
 
 function onSearch(e) {
   e.preventDefault();
-  showFindAndScroll = 1;
+  showFindAndScroll = true;
   counter = 1;
   refs.gallery.innerHTML = '';
   searchQuery = e.currentTarget.elements.searchQuery.value.trim();
@@ -30,7 +30,7 @@ function onSearch(e) {
 
 const optionsScroll = {
   root: null,
-  rootMargin: '500px',
+  rootMargin: '1000px',
   threshold: 0,
 };
 const observer = new IntersectionObserver(onPagination, optionsScroll);
@@ -76,7 +76,7 @@ async function getImg(query) {
     galleryMarkup(data);
     if (showFindAndScroll) {
       Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
-      showFindAndScroll -= 1;
+      showFindAndScroll = false;
     }
   } catch (error) {
     console.log(error.message);
@@ -118,6 +118,10 @@ function galleryMarkup(imgData) {
       }
     )
     .join('');
+
+  createElements(markup);
+}
+function createElements(markup) {
   refs.gallery.insertAdjacentHTML('beforeend', markup);
   observer.observe(refs.guard);
   imgGallery = new SimpleLightbox(
