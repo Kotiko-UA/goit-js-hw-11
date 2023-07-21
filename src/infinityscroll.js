@@ -128,15 +128,6 @@ function createElements(markup) {
     '.gallery .photo-card .img-link',
     optionSimple
   );
-
-  const { height: cardHeight } =
-    refs.gallery.firstElementChild.getBoundingClientRect();
-  if (!showFindAndScroll) {
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
-  }
 }
 
 function onImgClick(e) {
