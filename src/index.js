@@ -18,9 +18,11 @@ refs.loadMoreBtn.addEventListener('click', onLoadMore);
 let counter = 1;
 let totalPageCounter = 40;
 let searchQuery = '';
+let weFoundShow = 1;
 
 function onSearch(e) {
   e.preventDefault();
+  weFoundShow = 1;
   counter = 1;
   refs.gallery.innerHTML = '';
   refs.loadMoreBtn.classList.add('js-hide');
@@ -55,8 +57,10 @@ async function getImg(query) {
     }
 
     galleryMarkup(data);
-
-    Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
+    if (weFoundShow) {
+      Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
+      weFoundShow -= 1;
+    }
   } catch (error) {
     console.log(error.message);
   }
