@@ -18,11 +18,11 @@ refs.loadMoreBtn.addEventListener('click', onLoadMore);
 let counter = 1;
 let totalPageCounter = 40;
 let searchQuery = '';
-let weFoundShow = 1;
+let showFindAndScroll = 1;
 
 function onSearch(e) {
   e.preventDefault();
-  weFoundShow = 1;
+  showFindAndScroll = 1;
   counter = 1;
   refs.gallery.innerHTML = '';
   refs.loadMoreBtn.classList.add('js-hide');
@@ -57,9 +57,9 @@ async function getImg(query) {
     }
 
     galleryMarkup(data);
-    if (weFoundShow) {
+    if (showFindAndScroll) {
       Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
-      weFoundShow -= 1;
+      showFindAndScroll -= 1;
     }
   } catch (error) {
     console.log(error.message);
@@ -104,6 +104,15 @@ function galleryMarkup(imgData) {
   refs.gallery.insertAdjacentHTML('beforeend', markup);
   refs.loadMoreBtn.classList.remove('js-hide');
   imgGallery = new SimpleLightbox('.gallery .photo-card .img-link', option);
+
+  const { height: cardHeight } =
+    refs.gallery.firstElementChild.getBoundingClientRect();
+  if (!showFindAndScroll) {
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  }
 }
 
 function onImgClick(e) {
