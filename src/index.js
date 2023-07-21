@@ -59,6 +59,15 @@ async function getImg(query) {
     console.log(error.message);
   }
 }
+let imgGallery = null;
+
+const option = {
+  captions: true,
+  captionType: 'attr',
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+};
 
 function galleryMarkup(imgData) {
   const markup = imgData.data.hits
@@ -72,24 +81,28 @@ function galleryMarkup(imgData) {
         comments,
         downloads,
       } = {}) => {
-        return `<div class="photo-card"><a class="img-link" href="${largeImageURL}"><img width="320" class="gallery-image" src="${webformatURL}" alt="${tags}" loading="lazy"/></a><div class="info"><p class="info-item"><b>Likes</b>${likes}</p><p class="info-item"><b>Views</b>${views}</p> <p class="info-item"><b>Comments</b>${comments}</p><p class="info-item"><b>Downloads</b>${downloads}</p></div></div>`;
+        return `<div class="photo-card">
+        <a class="img-link" href="${largeImageURL}">
+        <img width="320" class="gallery-image" src="${webformatURL}" alt="${tags}" loading="lazy"/>
+        </a>
+        <div class="info">
+        <p class="info-item"><b>Likes</b>${likes}</p>
+        <p class="info-item"><b>Views</b>${views}</p>
+        <p class="info-item"><b>Comments</b>${comments}</p>
+        <p class="info-item"><b>Downloads</b>${downloads}</p>
+        </div>
+        </div>`;
       }
     )
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
   refs.loadMoreBtn.classList.remove('js-hide');
+  imgGallery = new SimpleLightbox('.gallery .photo-card .img-link', option);
 }
-const option = {
-  captions: true,
-  captionType: 'attr',
-  captionsData: 'alt',
-  captionPosition: 'bottom',
-  captionDelay: 250,
-};
-const imgGallery = new SimpleLightbox('.gallery .photo-card .img-link', option);
 
 function onImgClick(e) {
   e.preventDefault();
+
   if (e.target.classList.contains('gallery-image')) {
     imgGallery.on('show .simplelightbox');
   }
