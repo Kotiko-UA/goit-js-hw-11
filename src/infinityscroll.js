@@ -19,16 +19,17 @@ const observer = new IntersectionObserver(onPagination, optionsScroll);
 refs.form.addEventListener('submit', onSearch);
 refs.gallery.addEventListener('click', onImgClick);
 
-let counter = 1;
-let totalPageCounter = 40;
+let counter = 0;
+let totalPageCounter = 0;
 let searchQuery = '';
 let showFindAndScroll = true;
 
 function onSearch(e) {
   e.preventDefault();
   observer.unobserve(refs.guard);
+  counter = 0;
+  totalPageCounter = 0;
   showFindAndScroll = true;
-  counter = 1;
   refs.gallery.innerHTML = '';
   searchQuery = e.currentTarget.elements.searchQuery.value.trim();
   getImg(searchQuery);
@@ -37,29 +38,14 @@ function onSearch(e) {
 function onPagination(entries) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
-      onLoadMore();
-
-      if (totalPageCounter > 500) {
-        observer.unobserve(entry.target);
-      }
+      getImg(searchQuery);
     }
   });
 }
 
-function onLoadMore() {
+async function getImg(query) {
   counter += 1;
   totalPageCounter += 40;
-  if (totalPageCounter > 500) {
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results."
-    );
-    return;
-  }
-
-  getImg(searchQuery);
-}
-
-async function getImg(query) {
   try {
     const data = await axios.get(
       `${API_URL}${API_KEY}&q=${query}&per_page=40&page=${counter}`
@@ -68,7 +54,9 @@ async function getImg(query) {
       throw new Error(data.status);
     }
     if (data.data.hits.length === 0) {
-      Notify.failure('enter a valid value to search for');
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
       return;
     }
 
@@ -76,6 +64,14 @@ async function getImg(query) {
     if (showFindAndScroll) {
       Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
       showFindAndScroll = false;
+    }
+
+    if (totalPageCounter > data.data.totalHits) {
+      Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
+      observer.unobserve(refs.guard);
+      return;
     }
   } catch (error) {
     console.log(error.message);

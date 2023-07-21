@@ -13,37 +13,27 @@ const refs = {
 refs.loadMoreBtn.classList.add('js-hide');
 refs.form.addEventListener('submit', onSearch);
 refs.gallery.addEventListener('click', onImgClick);
-refs.loadMoreBtn.addEventListener('click', onLoadMore);
+refs.loadMoreBtn.addEventListener('click', () => getImg(searchQuery));
 
-let counter = 1;
-let totalPageCounter = 40;
+let counter = 0;
+let totalPageCounter = 0;
 let searchQuery = '';
-let showFindAndScroll = 1;
+let showFindAndScroll = true;
 
 function onSearch(e) {
   e.preventDefault();
-  showFindAndScroll = 1;
-  counter = 1;
+  showFindAndScroll = true;
+  counter = 0;
+  totalPageCounter = 0;
   refs.gallery.innerHTML = '';
   refs.loadMoreBtn.classList.add('js-hide');
   searchQuery = e.currentTarget.elements.searchQuery.value.trim();
   getImg(searchQuery);
 }
 
-function onLoadMore() {
+async function getImg(query) {
   counter += 1;
   totalPageCounter += 40;
-  if (totalPageCounter > 500) {
-    refs.loadMoreBtn.classList.add('js-hide');
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results."
-    );
-    return;
-  }
-  getImg(searchQuery);
-}
-
-async function getImg(query) {
   try {
     const data = await axios.get(
       `${API_URL}${API_KEY}&q=${query}&per_page=40&page=${counter}`
@@ -52,14 +42,23 @@ async function getImg(query) {
       throw new Error(data.status);
     }
     if (data.data.hits.length === 0) {
-      Notify.failure('enter a valid value to search for');
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
       return;
     }
-
     galleryMarkup(data);
     if (showFindAndScroll) {
       Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
-      showFindAndScroll -= 1;
+      showFindAndScroll = false;
+    }
+
+    if (totalPageCounter > data.data.totalHits) {
+      refs.loadMoreBtn.classList.add('js-hide');
+      Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
+      return;
     }
   } catch (error) {
     console.log(error.message);
