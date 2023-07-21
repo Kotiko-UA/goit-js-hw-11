@@ -55,6 +55,8 @@ async function getImg(query) {
     }
 
     galleryMarkup(data);
+
+    Notify.success(`Hooray! We found ${data.data.totalHits} images.`);
   } catch (error) {
     console.log(error.message);
   }
