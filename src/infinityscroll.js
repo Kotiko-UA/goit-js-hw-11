@@ -124,6 +124,7 @@ function galleryMarkup(imgData) {
 function createElements(markup) {
   refs.gallery.insertAdjacentHTML('beforeend', markup);
   observer.observe(refs.guard);
+
   imgGallery = new SimpleLightbox(
     '.gallery .photo-card .img-link',
     optionSimple
