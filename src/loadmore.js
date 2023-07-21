@@ -103,7 +103,6 @@ function galleryMarkup(imgData) {
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markup);
   refs.loadMoreBtn.classList.remove('js-hide');
-
   imgGallery = new SimpleLightbox('.gallery .photo-card .img-link', option);
 
   const { height: cardHeight } =
